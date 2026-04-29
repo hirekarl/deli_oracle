@@ -2,7 +2,7 @@ import { google } from '@ai-sdk/google';
 import { streamText, tool } from 'ai';
 import { BERNIE_SYSTEM_PROMPT } from '@/lib/prompt';
 import { z } from 'zod';
-import { logShakedown } from '@/lib/shakedown-logger';
+import { logShakedown, getShakedownLogs } from '@/lib/shakedown-logger';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -15,9 +15,16 @@ export async function POST(req: Request) {
       return new Response('Invalid request: messages array is required', { status: 400 });
     }
 
+    const recentLogs = getShakedownLogs().slice(0, 5);
+    const historyContext = recentLogs.length > 0 
+      ? `\n\nRECENT SHAKEDOWNS YOU'VE ALREADY MADE:
+         ${recentLogs.map(l => `- ${l.partnerName} (${l.shakedownCode})`).join('\n')}
+         Don't be a broken record. If you've already shakedown-ed someone for a specific partner, maybe try a different one or just tell 'em to move along.`
+      : '';
+
     const result = streamText({
       model: google('gemini-2.5-flash'),
-      system: BERNIE_SYSTEM_PROMPT + `
+      system: BERNIE_SYSTEM_PROMPT + historyContext + `
       
       ADDITIONAL INSTRUCTION: 
       If you recommend a Preferred Partner, you MUST call the 'triggerShakedown' tool. 
