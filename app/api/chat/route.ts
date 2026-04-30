@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       tools: {
         triggerShakedown: tool({
           description: 'Triggers a shakedown badge for an affiliate partner.',
-          parameters: z.object({
+          inputSchema: z.object({
             partnerName: z.string(),
             shakedownCode: z.string(),
             offer: z.string(),
