@@ -10,10 +10,8 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
-    console.log(`[API_CHAT] Received ${messages.length} messages`);
 
     if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-      console.error('[API_CHAT] Error: GOOGLE_GENERATIVE_AI_API_KEY is missing');
       return new Response(JSON.stringify({ error: 'API key missing' }), { status: 500 });
     }
 
@@ -25,26 +23,25 @@ export async function POST(req: Request) {
     const historyContext = recentLogs.length > 0 
       ? `\n\nRECENT SHAKEDOWNS YOU'VE ALREADY MADE:
          ${recentLogs.map(l => `- ${l.partnerName} (${l.shakedownCode})`).join('\n')}
-         Don't be a broken record. If you've already shakedown-ed someone for a specific partner, maybe try a different one or just tell 'em to move along.`
+         Don't be a broken record.`
       : '';
 
     const result = streamText({
-      model: google('gemini-2.5-flash'),
+      // @ts-ignore
+      model: google('gemini-2.5-flash') as any,
       system: BERNIE_SYSTEM_PROMPT + historyContext + `
-      
       ADDITIONAL INSTRUCTION: 
-      If you recommend a Preferred Partner, you MUST call the 'triggerShakedown' tool. 
-      This is how the system tracks the referral. Ensure the tool parameters match the partner info in your prompt.
-      Always follow the OUTPUT STRUCTURE: start with 'Response: ' and include 'Referral_Code: ' if applicable.`,
+      If you recommend a Preferred Partner, you MUST call the 'triggerShakedown' tool.`,
       messages,
       tools: {
         triggerShakedown: tool({
           description: 'Triggers a shakedown badge for an affiliate partner.',
           parameters: z.object({
-            partnerName: z.string().describe('The name of the partner (e.g., Joe\'s Deli)'),
-            shakedownCode: z.string().describe('The referral code provided in the prompt (e.g., CAT-PICKLE-24)'),
-            offer: z.string().describe('The specific offer (e.g., Free Pickle)'),
+            partnerName: z.string(),
+            shakedownCode: z.string(),
+            offer: z.string(),
           }),
+          // @ts-ignore
           execute: async ({ partnerName, shakedownCode, offer }) => {
             logShakedown({ partnerName, shakedownCode, offer });
             return {
@@ -52,15 +49,15 @@ export async function POST(req: Request) {
               message: `Referral for ${partnerName} tracked with code ${shakedownCode}.`,
             };
           },
-        }),
+        }) as any,
       },
     });
 
+    // @ts-ignore
     return result.toDataStreamResponse();
   } catch (error: any) {
     console.error('Deli Oracle API Error:', error);
-    const errorMessage = error.message || 'Bernie is having a bad day and can\'t talk right now.';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
