@@ -64,6 +64,12 @@ export default function DeliOracle() {
       {/* Background Aesthetic: Neon Cat */}
       <div className="neon-bg-cat">🐈</div>
 
+      {/* THE ACTUAL CAT */}
+      <div className="cat-container">
+        {/* Placeholder for an actual image, using a large emoji for now that fits the style */}
+        <div style={{ fontSize: '20vw' }} className="cat-image">🐈‍⬛</div>
+      </div>
+
       {/* HEADER / IDLE STATE */}
       <div className="neon-sign">
         Deli<br />Oracle

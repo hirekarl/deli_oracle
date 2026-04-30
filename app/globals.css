@@ -55,11 +55,40 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border-left: 2.5vw solid var(--taxi-yellow); /* Thick accent bar */
   padding: 4vh 4vw;
-  min-height: 30vh;
+  max-height: 50vh; /* Limit height to prevent cutting off */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* Start from top for scrolling */
   box-shadow: 20px 20px 0px rgba(0, 0, 0, 0.5); /* Hard shadow for depth */
+  overflow-y: auto; /* Allow scrolling within the bubble */
+  scrollbar-width: none;
+}
+
+.bubble::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-container {
+  position: absolute;
+  top: 10vh;
+  right: 5vw;
+  width: 25vw;
+  height: 25vw;
+  z-index: 5;
+  pointer-events: none;
+  filter: drop-shadow(0 0 15px var(--taxi-yellow));
+}
+
+.cat-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 .bernie-text {
