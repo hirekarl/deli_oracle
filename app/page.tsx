@@ -101,8 +101,8 @@ export default function DeliOracle() {
         <div className="bernie-visual">
           <div className="cat-frame">
             <img 
-              src="https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?auto=format&fit=crop&q=80&w=1000" 
-              alt="Authentic Bodega Cat" 
+              src="/bernie.png" 
+              alt="The Deli Oracle" 
               className="cat-image"
             />
           </div>
