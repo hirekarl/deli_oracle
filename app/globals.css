@@ -102,6 +102,12 @@ button {
   filter: drop-shadow(0 0 20px var(--accent));
 }
 
+.message-error {
+  color: #ff4444;
+  background: rgba(255, 0, 0, 0.1);
+  border-left: 0.5vw solid #ff4444;
+}
+
 .typing-indicator {
   font-style: italic;
   opacity: 0.7;

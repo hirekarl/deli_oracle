@@ -4,7 +4,7 @@ import { useChat } from '@ai-sdk/react';
 import { useState, useEffect, useRef } from 'react';
 
 export default function DeliOracle() {
-  const { messages, sendMessage, status } = useChat();
+  const { messages, sendMessage, status, error } = useChat();
   const [input, setInput] = useState('');
   const [shakedown, setShakedown] = useState<{ partner: string; code: string; offer: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -28,7 +28,7 @@ export default function DeliOracle() {
 
     const shakedownPart = lastMessage.parts.find(
       (p) => p.type === 'tool-triggerShakedown' && p.state === 'output-available'
-    );
+    ) as any;
 
     if (shakedownPart && 'input' in shakedownPart) {
       const { partnerName, shakedownCode, offer } = shakedownPart.input as {
@@ -52,11 +52,17 @@ export default function DeliOracle() {
     setInput('');
   };
 
-  const getMessageText = (m: (typeof messages)[number]) =>
-    m.parts
+  const getMessageText = (m: (typeof messages)[number]) => {
+    const text = m.parts
       .filter((p) => p.type === 'text')
       .map((p) => p.text)
       .join('');
+
+    if (!text && m.parts.some((p) => p.type.startsWith('tool-'))) {
+      return 'Bernie is making a call...';
+    }
+    return text;
+  };
 
   return (
     <main>
@@ -81,12 +87,19 @@ export default function DeliOracle() {
             Bernie is judging you...
           </div>
         )}
+
+        {error && (
+          <div className="message assistant message-error">
+            Bernie: &quot;I&apos;m bricked right now. Try again later, son.&quot; ({error.message})
+          </div>
+        )}
       </div>
 
       {shakedown && (
         <>
-          <div className="affiliate-backdrop" />
+          <div className="affiliate-backdrop" onClick={() => setShakedown(null)} />
           <div className="affiliate-popup">
+            <button type="button" className="close-btn" onClick={() => setShakedown(null)}>✕</button>
             <div className="badge-header">🚨 SHAKEDOWN ALERT 🚨</div>
             <div className="badge-body">
               <span className="partner">{shakedown.partner}</span>
