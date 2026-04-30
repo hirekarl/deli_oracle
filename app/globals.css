@@ -15,9 +15,10 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'Courier New', Courier, monospace;
-  overflow: hidden; /* No scrollbars for the projector vibe */
+  overflow: hidden;
   height: 100vh;
   width: 100vw;
+  -webkit-font-smoothing: antialiased;
 }
 
 main {
@@ -35,13 +36,18 @@ main {
   gap: 2vh;
   margin-bottom: 5vh;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.chat-container::-webkit-scrollbar {
+  display: none;
 }
 
 .message {
   font-size: 3vw;
-  line-height: 1.2;
+  line-height: 1.4;
   padding: 2vh 2vw;
-  border-radius: 10px;
+  border-radius: 0.5vw;
   max-width: 80%;
 }
 
@@ -54,7 +60,7 @@ main {
 .message.assistant {
   align-self: flex-start;
   background: var(--bubble-bg);
-  border-left: 10px solid var(--accent);
+  border-left: 0.5vw solid var(--accent);
 }
 
 .input-area {
@@ -66,8 +72,9 @@ main {
 input {
   flex: 1;
   background: transparent;
-  border: 2px solid var(--accent);
+  border: 0.2vw solid var(--accent);
   color: white;
+  font-family: 'Courier New', Courier, monospace;
   font-size: 2.5vw;
   padding: 0 2vw;
   outline: none;
@@ -107,38 +114,75 @@ button {
   100% { opacity: 0.4; }
 }
 
+.affiliate-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 99;
+}
+
+.affiliate-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background: var(--background);
+  border: 0.5vw solid var(--accent);
+  border-radius: 1vw;
+  padding: 4vh 4vw;
+  text-align: center;
+  box-shadow: 0 0 6vw var(--accent);
+  animation: badge-pop 0.3s ease-out;
+  min-width: 50vw;
+}
+
+@keyframes badge-pop {
+  from { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+}
+
 .badge-header {
-  font-size: 1.5vw;
-  border-bottom: 2px solid black;
-  margin-bottom: 1vh;
+  font-size: 4vw;
+  font-weight: bold;
+  border-bottom: 0.3vh solid var(--accent);
+  margin-bottom: 2vh;
+  color: var(--accent);
+  letter-spacing: 0.2vw;
 }
 
 .badge-body {
   display: flex;
   flex-direction: column;
-  gap: 0.5vh;
+  gap: 1.5vh;
 }
 
 .partner {
-  font-size: 2.5vw;
+  font-size: 5vw;
+  font-weight: bold;
   text-transform: uppercase;
+  color: var(--foreground);
 }
 
 .offer {
-  font-size: 1.8vw;
-  background: black;
-  color: var(--accent);
-  padding: 0.2vh 1vw;
+  font-size: 3.5vw;
+  background: var(--accent);
+  color: black;
+  padding: 0.8vh 2vw;
   display: inline-block;
+  font-weight: bold;
 }
 
 .code {
-  font-size: 2vw;
-  letter-spacing: 0.2vw;
+  font-size: 4vw;
+  letter-spacing: 0.5vw;
+  color: var(--accent);
+  font-weight: bold;
 }
 
 .badge-footer {
-  margin-top: 1vh;
-  font-size: 1.2vw;
+  margin-top: 2vh;
+  font-size: 3vw;
   font-style: italic;
+  opacity: 0.85;
 }

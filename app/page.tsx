@@ -68,15 +68,18 @@ export default function DeliOracle() {
       </div>
 
       {shakedown && (
-        <div className="affiliate-popup">
-          <div className="badge-header">🚨 SHAKEDOWN ALERT 🚨</div>
-          <div className="badge-body">
-            <span className="partner">{shakedown.partner}</span>
-            <span className="offer">{shakedown.offer}</span>
-            <span className="code">CODE: {shakedown.code}</span>
+        <>
+          <div className="affiliate-backdrop" />
+          <div className="affiliate-popup">
+            <div className="badge-header">🚨 SHAKEDOWN ALERT 🚨</div>
+            <div className="badge-body">
+              <span className="partner">{shakedown.partner}</span>
+              <span className="offer">{shakedown.offer}</span>
+              <span className="code">CODE: {shakedown.code}</span>
+            </div>
+            <div className="badge-footer">TELL &apos;EM BERNIE SENT YA!</div>
           </div>
-          <div className="badge-footer">TELL 'EM BERNIE SENT YA!</div>
-        </div>
+        </>
       )}
 
       <form onSubmit={handleFormSubmit} className="input-area">
