@@ -28,15 +28,15 @@ export async function POST(req: Request) {
       
       ADDITIONAL INSTRUCTION: 
       If you recommend a Preferred Partner, you MUST call the 'triggerShakedown' tool. 
-      This is how the system tracks the referral. Do not just mention the code in text; 
-      execute the tool as well.`,
+      This is how the system tracks the referral. Ensure the tool parameters match the partner info in your prompt.
+      Always follow the OUTPUT STRUCTURE: start with 'Response: ' and include 'Referral_Code: ' if applicable.`,
       messages,
       tools: {
         triggerShakedown: tool({
           description: 'Triggers a shakedown badge for an affiliate partner.',
           parameters: z.object({
             partnerName: z.string().describe('The name of the partner (e.g., Joe\'s Deli)'),
-            shakedownCode: z.string().describe('The generated CAT-ITEM-YY code'),
+            shakedownCode: z.string().describe('The referral code provided in the prompt (e.g., CAT-PICKLE-24)'),
             offer: z.string().describe('The specific offer (e.g., Free Pickle)'),
           }),
           execute: async ({ partnerName, shakedownCode, offer }) => {
