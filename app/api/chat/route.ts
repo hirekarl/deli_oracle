@@ -10,6 +10,12 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
+    console.log(`[API_CHAT] Received ${messages.length} messages`);
+
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+      console.error('[API_CHAT] Error: GOOGLE_GENERATIVE_AI_API_KEY is missing');
+      return new Response(JSON.stringify({ error: 'API key missing' }), { status: 500 });
+    }
 
     if (!messages || !Array.isArray(messages)) {
       return new Response('Invalid request: messages array is required', { status: 400 });

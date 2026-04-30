@@ -32,7 +32,6 @@ main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   gap: 2vh;
   margin-bottom: 5vh;
   overflow-y: auto;
@@ -49,6 +48,8 @@ main {
   padding: 2vh 2vw;
   border-radius: 0.5vw;
   max-width: 80%;
+  min-height: 5vh;
+  word-wrap: break-word;
 }
 
 .message.user {
@@ -135,6 +136,23 @@ button {
   box-shadow: 0 0 6vw var(--accent);
   animation: badge-pop 0.3s ease-out;
   min-width: 50vw;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1vh;
+  right: 1vw;
+  background: transparent;
+  color: var(--accent);
+  border: none;
+  font-size: 3vw;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: white;
 }
 
 @keyframes badge-pop {

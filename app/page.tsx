@@ -4,12 +4,13 @@ import { useChat } from 'ai/react';
 import { useState, useEffect, useRef } from 'react';
 
 export default function DeliOracle() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat();
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat();
   const [shakedown, setShakedown] = useState<{ partner: string; code: string; offer: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   
   // Auto-scroll to bottom with smooth behavior for projector
   useEffect(() => {
+    console.log('[DEBUG] Messages updated:', messages);
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
         top: scrollRef.current.scrollHeight,
@@ -38,6 +39,7 @@ export default function DeliOracle() {
   }, [messages]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log('[DEBUG] Form submitted with input:', input);
     // Dev 4: Trigger doorbell chime here!
     handleSubmit(e);
   };
@@ -56,7 +58,7 @@ export default function DeliOracle() {
         
         {messages.map((m) => (
           <div key={m.id} className={`message ${m.role}`}>
-            {m.content}
+            {m.content || (m.toolInvocations?.length ? 'Bernie is making a call...' : '')}
           </div>
         ))}
         
@@ -65,12 +67,19 @@ export default function DeliOracle() {
             Bernie is judging you...
           </div>
         )}
+
+        {error && (
+          <div className="message assistant" style={{ color: '#ff4444', background: 'rgba(255,0,0,0.1)', borderLeft: '0.5vw solid #ff4444' }}>
+            Bernie: "I&apos;m bricked right now. Try again later, son." ({error.message})
+          </div>
+        )}
       </div>
 
       {shakedown && (
         <>
-          <div className="affiliate-backdrop" />
+          <div className="affiliate-backdrop" onClick={() => setShakedown(null)} />
           <div className="affiliate-popup">
+            <button className="close-btn" onClick={() => setShakedown(null)}>✕</button>
             <div className="badge-header">🚨 SHAKEDOWN ALERT 🚨</div>
             <div className="badge-body">
               <span className="partner">{shakedown.partner}</span>
