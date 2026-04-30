@@ -64,41 +64,48 @@ export default function DeliOracle() {
       {/* Background Aesthetic: Neon Cat */}
       <div className="neon-bg-cat">🐈</div>
 
-      {/* THE ACTUAL CAT */}
-      <div className="cat-container">
-        {/* Placeholder for an actual image, using a large emoji for now that fits the style */}
-        <div style={{ fontSize: '20vw' }} className="cat-image">🐈‍⬛</div>
-      </div>
-
       {/* HEADER / IDLE STATE */}
       <div className="neon-sign">
         Deli<br />Oracle
       </div>
 
-      {/* CONVERSATION AREA */}
-      <div className={`chat-display ${isLoading ? 'thinking' : ''}`} ref={scrollRef}>
-        {lastUserMessage && (
-          <div className="user-text">
-            &quot;{lastUserMessage.content}&quot;
-          </div>
-        )}
-
-        <div className="bubble">
-          <div className="bernie-text">
-            {isLoading ? "Bernie is judging you..." : (lastAssistantMessage ? getMessageText(lastAssistantMessage) : "Yo. I'm Bernie. I've been in this bodega since the towers fell. What's your deal?")}
-          </div>
-
-          {shakedown && (
-            <div className="affiliate-badge">
-              {shakedown.partner} | {shakedown.offer} | CODE: {shakedown.code}
+      <div className="content-area">
+        {/* CONVERSATION AREA */}
+        <div className={`chat-display ${isLoading ? 'thinking' : ''}`}>
+          {lastUserMessage && (
+            <div className="user-text">
+              &quot;{lastUserMessage.content}&quot;
             </div>
           )}
 
-          {error && (
-            <div className="error-text">
-              Bernie: &quot;I&apos;m bricked right now. Try again later, son.&quot; ({error.message})
+          <div className="bubble" ref={scrollRef}>
+            <div className="bernie-text">
+              {isLoading ? "Bernie is judging you..." : (lastAssistantMessage ? getMessageText(lastAssistantMessage) : "Yo. I'm Bernie. I've been in this bodega since the towers fell. What's your deal?")}
             </div>
-          )}
+
+            {shakedown && (
+              <div className="affiliate-badge">
+                {shakedown.partner} | {shakedown.offer} | CODE: {shakedown.code}
+              </div>
+            )}
+
+            {error && (
+              <div className="error-text">
+                Bernie: &quot;I&apos;m bricked right now. Try again later, son.&quot; ({error.message})
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* BERNIE VISUAL */}
+        <div className="bernie-visual">
+          <div className="cat-frame">
+            <img 
+              src="https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&q=80&w=1000" 
+              alt="Grumpy Bodega Cat" 
+              className="cat-image"
+            />
+          </div>
         </div>
       </div>
 

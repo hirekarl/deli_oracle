@@ -24,7 +24,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 6vh 5vw;
+  padding: 4vh 5vw;
 }
 
 /* --- THE NEON (IDLE STATE) --- */
@@ -50,39 +50,48 @@ body {
   filter: drop-shadow(0 0 20px var(--taxi-yellow));
 }
 
-/* --- THE BUBBLE (PAYOFF STATE) --- */
-.bubble {
-  background: rgba(255, 255, 255, 0.08);
-  border-left: 2.5vw solid var(--taxi-yellow); /* Thick accent bar */
-  padding: 4vh 4vw;
-  max-height: 50vh; /* Limit height to prevent cutting off */
+/* --- CONTENT AREA --- */
+.content-area {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4vw;
+  flex: 1;
+  min-height: 0;
+  margin: 2vh 0;
+}
+
+.chat-display {
+  flex: 2;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Start from top for scrolling */
-  box-shadow: 20px 20px 0px rgba(0, 0, 0, 0.5); /* Hard shadow for depth */
-  overflow-y: auto; /* Allow scrolling within the bubble */
-  scrollbar-width: none;
+  justify-content: center;
+  min-width: 0;
 }
 
-.bubble::-webkit-scrollbar {
-  display: none;
+.bernie-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
-.cat-container {
-  position: absolute;
-  top: 10vh;
-  right: 5vw;
-  width: 25vw;
-  height: 25vw;
-  z-index: 5;
-  pointer-events: none;
-  filter: drop-shadow(0 0 15px var(--taxi-yellow));
+.cat-frame {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border: 1vw solid white;
+  background: #000;
+  box-shadow: 15px 15px 0px var(--taxi-yellow);
+  overflow: hidden;
+  position: relative;
 }
 
 .cat-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  filter: grayscale(0.5) contrast(1.2);
   animation: breathe 4s ease-in-out infinite;
 }
 
@@ -91,8 +100,26 @@ body {
   50% { transform: scale(1.05); }
 }
 
+/* --- THE BUBBLE (PAYOFF STATE) --- */
+.bubble {
+  background: rgba(255, 255, 255, 0.08);
+  border-left: 2vw solid var(--taxi-yellow); /* Thick accent bar */
+  padding: 3vh 3vw;
+  max-height: 45vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Start from top for scrolling */
+  box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.5); /* Hard shadow for depth */
+  overflow-y: auto; /* Allow scrolling within the bubble */
+  scrollbar-width: none;
+}
+
+.bubble::-webkit-scrollbar {
+  display: none;
+}
+
 .bernie-text {
-  font-size: 5.5vw; /* Extremely large for readability */
+  font-size: 5vw; /* Extremely large for readability */
   line-height: 1.1;
   font-weight: 700;
   letter-spacing: -0.02em;
