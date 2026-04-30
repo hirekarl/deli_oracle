@@ -8,7 +8,7 @@ export default function DeliOracle() {
   const [shakedown, setShakedown] = useState<{ partner: string; code: string; offer: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  // Auto-scroll to bottom with smooth behavior for projector
+  // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -30,56 +30,45 @@ export default function DeliOracle() {
         const { partnerName, shakedownCode, offer } = shakedownTool.args as any;
         setShakedown({ partner: partnerName, code: shakedownCode, offer });
         
-        // Keep the badge visible for 15 seconds for the audience
         const timer = setTimeout(() => setShakedown(null), 15000);
         return () => clearTimeout(timer);
       }
     }
   }, [messages]);
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    // Dev 4: Trigger doorbell chime here!
-    handleSubmit(e);
-  };
+  const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant');
+  const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
 
   return (
-    <main>
-      {/* Background Aesthetic: Neon Cat */}
-      <div className="neon-bg-cat">🐈</div>
-
-      <div className="chat-container" ref={scrollRef}>
-        {messages.length === 0 && (
-          <div className="message assistant">
-            Yo. I'm Bernie. I've been in this bodega since the towers fell. What's your deal?
-          </div>
-        )}
-        
-        {messages.map((m) => (
-          <div key={m.id} className={`message ${m.role}`}>
-            {m.content}
-          </div>
-        ))}
-        
-        {isLoading && (
-          <div className="message assistant typing-indicator">
-            Bernie is judging you...
-          </div>
-        )}
+    <main className="bodega-shell">
+      {/* HEADER / IDLE STATE */}
+      <div className="neon-sign">
+        Deli<br />Oracle
       </div>
 
-      {shakedown && (
-        <div className="affiliate-popup">
-          <div className="badge-header">🚨 SHAKEDOWN ALERT 🚨</div>
-          <div className="badge-body">
-            <span className="partner">{shakedown.partner}</span>
-            <span className="offer">{shakedown.offer}</span>
-            <span className="code">CODE: {shakedown.code}</span>
+      {/* CONVERSATION AREA */}
+      <div className={`chat-display ${isLoading ? 'thinking' : ''}`} ref={scrollRef}>
+        {lastUserMessage && (
+          <div className="user-text">
+            "{lastUserMessage.content}"
           </div>
-          <div className="badge-footer">TELL 'EM BERNIE SENT YA!</div>
-        </div>
-      )}
+        )}
 
-      <form onSubmit={handleFormSubmit} className="input-area">
+        <div className="bubble">
+          <div className="bernie-text">
+            {isLoading ? "Bernie is judging you..." : (lastAssistantMessage?.content || "Yo. I'm Bernie. I've been in this bodega since the towers fell. What's your deal?")}
+          </div>
+
+          {shakedown && (
+            <div className="affiliate-badge">
+              {shakedown.partner} | {shakedown.offer} | CODE: {shakedown.code}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* KIOSK INPUT */}
+      <form onSubmit={handleSubmit} className="input-zone">
         <input
           value={input}
           placeholder="Ask Bernie for the neighborhood tea..."

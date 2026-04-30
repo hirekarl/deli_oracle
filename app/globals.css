@@ -1,144 +1,124 @@
 :root {
-  --background: #1a1a1a;
-  --foreground: #ffffff;
-  --accent: #ffcc00; /* NYC Taxi Yellow */
-  --bubble-bg: rgba(255, 255, 255, 0.1);
+  --taxi-yellow: #ffcc00;
+  --midnight: #0a0a0a; /* Deep black for maximum projector contrast */
+  --neon-glow: rgba(255, 204, 0, 0.4);
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Courier New', Courier, monospace;
-  overflow: hidden; /* No scrollbars for the projector vibe */
+  background-color: var(--midnight);
+  color: #ffffff;
+  font-family: 'Inter', 'Impact', sans-serif; /* Impact gives it that gritty NYC tabloid feel */
+  overflow: hidden; /* No scrollbars on a projector */
+}
+
+.bodega-shell {
   height: 100vh;
   width: 100vw;
-}
-
-main {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  padding: 5vh 5vw;
+  justify-content: space-between;
+  padding: 6vh 5vw;
 }
 
-.chat-container {
-  flex: 1;
+/* --- THE NEON (IDLE STATE) --- */
+.neon-sign {
+  font-size: 7vw; /* Massive scale */
+  line-height: 0.9;
+  font-weight: 900;
+  color: var(--taxi-yellow);
+  text-transform: uppercase;
+  text-shadow: 0 0 20px var(--taxi-yellow), 0 0 40px var(--neon-glow);
+  animation: flicker 4s infinite;
+}
+
+/* --- THE BUBBLE (PAYOFF STATE) --- */
+.bubble {
+  background: rgba(255, 255, 255, 0.08);
+  border-left: 2.5vw solid var(--taxi-yellow); /* Thick accent bar */
+  padding: 4vh 4vw;
+  min-height: 30vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 2vh;
-  margin-bottom: 5vh;
-  overflow-y: auto;
+  justify-content: center;
+  box-shadow: 20px 20px 0px rgba(0, 0, 0, 0.5); /* Hard shadow for depth */
 }
 
-.message {
+.bernie-text {
+  font-size: 5.5vw; /* Extremely large for readability */
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* --- THE USER TEXT (PROJECTOR OPTIMIZED) --- */
+.user-text {
   font-size: 3vw;
-  line-height: 1.2;
-  padding: 2vh 2vw;
-  border-radius: 10px;
-  max-width: 80%;
-}
-
-.message.user {
-  align-self: flex-end;
-  color: var(--accent);
+  color: var(--taxi-yellow);
   text-align: right;
+  margin-bottom: 2vh;
+  font-style: italic;
 }
 
-.message.assistant {
+/* --- THE AFFILIATE BADGE --- */
+.affiliate-badge {
+  background: var(--taxi-yellow);
+  color: #000;
+  font-size: 2.5vw;
+  font-weight: 900;
+  padding: 1vh 2vw;
+  margin-top: 3vh;
   align-self: flex-start;
-  background: var(--bubble-bg);
-  border-left: 10px solid var(--accent);
+  transform: rotate(-2deg); /* "Sticker" aesthetic */
+  box-shadow: 5px 5px 0px white;
 }
 
-.input-area {
-  height: 10vh;
+/* --- THE KIOSK INPUT --- */
+.input-zone {
   display: flex;
-  gap: 1vw;
+  gap: 0;
+  border: 0.8vw solid white;
+  background: var(--midnight);
 }
 
 input {
   flex: 1;
   background: transparent;
-  border: 2px solid var(--accent);
+  border: none;
   color: white;
-  font-size: 2.5vw;
-  padding: 0 2vw;
+  font-size: 3.5vw; /* Big enough for the person typing to see without squinting */
+  padding: 3vh;
   outline: none;
 }
 
 button {
-  background: var(--accent);
+  background: white;
   color: black;
   border: none;
-  font-size: 2vw;
-  font-weight: bold;
-  padding: 0 3vw;
+  font-size: 3vw;
+  font-weight: 900;
+  padding: 0 5vw;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
-.neon-bg-cat {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.05;
-  font-size: 30vw;
-  z-index: -1;
-  user-select: none;
-  filter: drop-shadow(0 0 20px var(--accent));
+button:hover {
+  background: var(--taxi-yellow);
 }
 
-.typing-indicator {
-  font-style: italic;
+/* --- ANIMATIONS --- */
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.4; filter: blur(1px); }
+}
+
+/* State Transitions */
+.thinking .bernie-text {
+  color: var(--taxi-yellow);
   opacity: 0.7;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-  100% { opacity: 0.4; }
-}
-
-.badge-header {
-  font-size: 1.5vw;
-  border-bottom: 2px solid black;
-  margin-bottom: 1vh;
-}
-
-.badge-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5vh;
-}
-
-.partner {
-  font-size: 2.5vw;
-  text-transform: uppercase;
-}
-
-.offer {
-  font-size: 1.8vw;
-  background: black;
-  color: var(--accent);
-  padding: 0.2vh 1vw;
-  display: inline-block;
-}
-
-.code {
-  font-size: 2vw;
-  letter-spacing: 0.2vw;
-}
-
-.badge-footer {
-  margin-top: 1vh;
-  font-size: 1.2vw;
-  font-style: italic;
 }
