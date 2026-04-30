@@ -4,11 +4,13 @@ import { useChat } from '@ai-sdk/react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function DeliOracle() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat();
+  const { messages, sendMessage, status, error } = useChat();
+  const [input, setInput] = useState('');
   const [shakedown, setShakedown] = useState<{ partner: string; code: string; offer: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  
-  // Auto-scroll to bottom
+
+  const isLoading = status === 'submitted' || status === 'streaming';
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -19,27 +21,24 @@ export default function DeliOracle() {
   }, [messages, isLoading]);
 
   // Detect tool invocations for the Shakedown Badge
+  // In ai v6, tool parts use type 'tool-{toolName}' and state 'output-available'
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
     if (!lastMessage?.parts) return;
 
     const shakedownPart = lastMessage.parts.find(
-      (p) => p.type === 'tool-invocation' && p.toolInvocation.toolName === 'triggerShakedown' && p.toolInvocation.state === 'result'
+      (p: any) => p.type === 'tool-triggerShakedown' && p.state === 'output-available'
     ) as any;
 
-    if (shakedownPart && shakedownPart.type === 'tool-invocation' && 'toolInvocation' in shakedownPart) {
-      const { toolInvocation } = shakedownPart;
-      if (toolInvocation.state === 'result') {
-        const { partnerName, shakedownCode, offer } = toolInvocation.args as {
-          partnerName: string;
-          shakedownCode: string;
-          offer: string;
-        };
-        setShakedown({ partner: partnerName, code: shakedownCode, offer });
-        
-        const timer = setTimeout(() => setShakedown(null), 15000);
-        return () => clearTimeout(timer);
-      }
+    if (shakedownPart) {
+      const { partnerName, shakedownCode, offer } = shakedownPart.input as {
+        partnerName: string;
+        shakedownCode: string;
+        offer: string;
+      };
+      setShakedown({ partner: partnerName, code: shakedownCode, offer });
+      const timer = setTimeout(() => setShakedown(null), 15000);
+      return () => clearTimeout(timer);
     }
   }, [messages]);
 
@@ -47,40 +46,43 @@ export default function DeliOracle() {
   const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
 
   const getMessageText = (m: any) => {
-    if (m.content) return m.content;
-    
-    const text = m.parts
-      ? m.parts
-          .filter((p: any) => p.type === 'text')
-          .map((p: any) => p.text)
-          .join('')
-      : '';
-    
-    return text;
+    if (!m?.parts) return '';
+    return m.parts
+      .filter((p: any) => p.type === 'text')
+      .map((p: any) => p.text)
+      .join('');
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    sendMessage({ text: input });
+    setInput('');
   };
 
   return (
     <main className="bodega-shell">
-      {/* Background Aesthetic: Neon Cat */}
       <div className="neon-bg-cat">🐈</div>
 
-      {/* HEADER / IDLE STATE */}
       <div className="neon-sign">
         Deli<br />Oracle
       </div>
 
       <div className="content-area">
-        {/* CONVERSATION AREA */}
         <div className={`chat-display ${isLoading ? 'thinking' : ''}`}>
           {lastUserMessage && (
             <div className="user-text">
-              &quot;{lastUserMessage.content}&quot;
+              &quot;{getMessageText(lastUserMessage)}&quot;
             </div>
           )}
 
           <div className="bubble" ref={scrollRef}>
             <div className="bernie-text">
-              {isLoading ? "Bernie is judging you..." : (lastAssistantMessage ? getMessageText(lastAssistantMessage) : "Yo. I'm Bernie. I've been in this bodega since the towers fell. What's your deal?")}
+              {isLoading
+                ? "Bernie is judging you..."
+                : lastAssistantMessage
+                  ? getMessageText(lastAssistantMessage)
+                  : "Yo. I'm Bernie. I've been in this bodega since the towers fell. What's your deal?"}
             </div>
 
             {shakedown && (
@@ -97,24 +99,22 @@ export default function DeliOracle() {
           </div>
         </div>
 
-        {/* BERNIE VISUAL */}
         <div className="bernie-visual">
           <div className="cat-frame">
-            <img 
-              src="/bernie.png" 
-              alt="The Deli Oracle" 
+            <img
+              src="/bernie.png"
+              alt="The Deli Oracle"
               className="cat-image"
             />
           </div>
         </div>
       </div>
 
-      {/* KIOSK INPUT */}
       <form onSubmit={handleSubmit} className="input-zone">
         <input
           value={input}
           placeholder="Ask Bernie for the neighborhood tea..."
-          onChange={handleInputChange}
+          onChange={(e) => setInput(e.target.value)}
           autoFocus
         />
         <button type="submit" disabled={isLoading}>
