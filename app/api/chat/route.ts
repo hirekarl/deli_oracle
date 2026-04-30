@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       : '';
 
     const result = streamText({
-      model: google('gemini-2.5-flash-preview-04-17'),
+      model: google('gemini-2.5-flash'),
       system: BERNIE_SYSTEM_PROMPT + historyContext + `
       ADDITIONAL INSTRUCTION:
       If you recommend a Preferred Partner, you MUST call the 'triggerShakedown' tool.`,
