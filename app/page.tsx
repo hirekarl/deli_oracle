@@ -1,15 +1,12 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function DeliOracle() {
-  const { messages, sendMessage, status, error } = useChat();
-  const [input, setInput] = useState('');
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error, append } = useChat();
   const [shakedown, setShakedown] = useState<{ partner: string; code: string; offer: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const isLoading = status === 'streaming' || status === 'submitted';
 
   // Auto-scroll to bottom with smooth behavior for projector
   useEffect(() => {
@@ -28,20 +25,23 @@ export default function DeliOracle() {
     if (!lastMessage?.parts) return;
 
     const shakedownPart = lastMessage.parts.find(
-      (p) => p.type === 'tool-triggerShakedown' && p.state === 'output-available'
-    );
+      (p) => p.type === 'tool-invocation' && p.toolInvocation.toolName === 'triggerShakedown' && p.toolInvocation.state === 'result'
+    ) as any;
 
-    if (shakedownPart && 'input' in shakedownPart) {
-      const { partnerName, shakedownCode, offer } = shakedownPart.input as {
-        partnerName: string;
-        shakedownCode: string;
-        offer: string;
-      };
-      setShakedown({ partner: partnerName, code: shakedownCode, offer });
+    if (shakedownPart && shakedownPart.type === 'tool-invocation' && 'toolInvocation' in shakedownPart) {
+      const { toolInvocation } = shakedownPart;
+      if (toolInvocation.state === 'result') {
+        const { partnerName, shakedownCode, offer } = toolInvocation.args as {
+          partnerName: string;
+          shakedownCode: string;
+          offer: string;
+        };
+        setShakedown({ partner: partnerName, code: shakedownCode, offer });
 
-      // Keep the badge visible for 15 seconds for the audience
-      const timer = setTimeout(() => setShakedown(null), 15000);
-      return () => clearTimeout(timer);
+        // Keep the badge visible for 15 seconds for the audience
+        const timer = setTimeout(() => setShakedown(null), 15000);
+        return () => clearTimeout(timer);
+      }
     }
   }, [messages]);
 
@@ -50,17 +50,20 @@ export default function DeliOracle() {
     if (!input.trim() || isLoading) return;
     console.log('[DEBUG] Form submitted with input:', input);
     // Dev 4: Trigger doorbell chime here!
-    sendMessage({ text: input });
-    setInput('');
+    handleSubmit(e);
   };
 
   const getMessageText = (m: (typeof messages)[number]) => {
-    const text = m.parts
-      .filter((p) => p.type === 'text')
-      .map((p) => p.text)
-      .join('');
+    if (m.content) return m.content;
     
-    if (!text && m.parts.some(p => p.type.startsWith('tool-'))) {
+    const text = m.parts
+      ? m.parts
+          .filter((p) => p.type === 'text')
+          .map((p) => p.text)
+          .join('')
+      : '';
+    
+    if (!text && m.parts?.some(p => p.type === 'tool-invocation')) {
       return 'Bernie is making a call...';
     }
     return text;
@@ -117,7 +120,7 @@ export default function DeliOracle() {
         <input
           value={input}
           placeholder="Ask Bernie for the neighborhood tea..."
-          onChange={(e) => setInput(e.target.value)}
+          onChange={handleInputChange}
           autoFocus
         />
         <button type="submit" disabled={isLoading}>
