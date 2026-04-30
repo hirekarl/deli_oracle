@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { streamText, tool } from 'ai';
+import { streamText, tool, convertToModelMessages } from 'ai';
 import { BERNIE_SYSTEM_PROMPT } from '@/lib/prompt';
 import { z } from 'zod';
 import { logShakedown, getShakedownLogs } from '@/lib/shakedown-logger';
@@ -27,12 +27,11 @@ export async function POST(req: Request) {
       : '';
 
     const result = streamText({
-      // @ts-ignore
-      model: google('gemini-2.5-flash') as any,
+      model: google('gemini-2.5-flash-preview-04-17'),
       system: BERNIE_SYSTEM_PROMPT + historyContext + `
-      ADDITIONAL INSTRUCTION: 
+      ADDITIONAL INSTRUCTION:
       If you recommend a Preferred Partner, you MUST call the 'triggerShakedown' tool.`,
-      messages,
+      messages: convertToModelMessages(messages),
       tools: {
         triggerShakedown: tool({
           description: 'Triggers a shakedown badge for an affiliate partner.',
@@ -41,7 +40,6 @@ export async function POST(req: Request) {
             shakedownCode: z.string(),
             offer: z.string(),
           }),
-          // @ts-ignore
           execute: async ({ partnerName, shakedownCode, offer }) => {
             logShakedown({ partnerName, shakedownCode, offer });
             return {
@@ -49,12 +47,11 @@ export async function POST(req: Request) {
               message: `Referral for ${partnerName} tracked with code ${shakedownCode}.`,
             };
           },
-        }) as any,
+        }),
       },
     });
 
-    // @ts-ignore
-    return result.toDataStreamResponse();
+    return result.toUIMessageStreamResponse();
   } catch (error: any) {
     console.error('Deli Oracle API Error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
