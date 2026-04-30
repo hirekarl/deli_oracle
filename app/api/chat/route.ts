@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       system: BERNIE_SYSTEM_PROMPT + historyContext + `
       ADDITIONAL INSTRUCTION:
       If you recommend a Preferred Partner, you MUST call the 'triggerShakedown' tool.`,
-      messages: convertToModelMessages(messages),
+      messages: await convertToModelMessages(messages),
       tools: {
         triggerShakedown: tool({
           description: 'Triggers a shakedown badge for an affiliate partner.',
